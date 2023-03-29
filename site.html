@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <title>История на заказ</title>
+ <meta charset="UTF-8">
+ <style>
+  body {
+   font-family: Times New Roman, sans-serif;
+   background-color: #00FA9A;
+  }
+
+  label {
+   display: block;
+  }
+
+  button {
+   margin-top: 10px;
+  }
+
+  canvas {
+   border: 1px solid black;
+   cursor: crosshair;
+  }
+
+  #clearCanvas {
+   margin-left: 10px;
+  }
+
+  #addText {
+   margin-left: 10px;
+  }
+
+ </style>
+</head>
+<body>
+  <div id="myButton">
+    <button><h1>КАК ИСПОЛЬЗОВАТЬ САЙТ?</h1></button>
+  </div>
+  <div id="myText" style="display:none">
+    <div style="background-color: white;"><p style="font-family: Times New Roman">Представим, что Вам нужно запомнить механизм действия препарата Дротаверин: блокирует фосфодиэстеразу в гладких миоцитах мышечной стенки кишечника, желчного пузыря, желчных протоков, внутренних органов(почки, печени), периферических сосудов. Теперь, нам нужно выделить отсюда самые важные слова: дротаверин, блок, фосфодиэстераза, миоциты, кишечник, пузырь, внутренности. Теперь нам нужно придумать легкие именно для нас слова(это индивидуально), похожие на ключевые слова выше: дротаверин - дротик; блок - кирпичный блок; фосфодиэстераза - стразы; миоциты - мяу; кишечник - кошатник; пузырь - пузырь(и так легко); внутренности - внутренний мир;. Из полученных слов придумываем веселую историю для запоминания. Далее нажимаем кнопку ДОБАВИТЬ ТЕКСТ НА КАРТИНКУ и вводим получившиеся слова в окне для текста. В результате сайт сохранит в нижней части холста вашу историю из слов дротик, кирпичный блок, стразы, мяу, кошатник, пузырь и внутренний мир. Полученную историю вы сможете нарисовать для себя на том же холсте на белом фоне разнымии цветами, которые можно выбрать, нажав на черный квадрат внизу.Полученную в результате картинку нужно сохранить, нажав на кнопку СОХРАНИТЬ. Такие картинки нужно повторять интервально - через 1 час после изучения, потом через 1 день, потом через 4 дня, потом через 16 дней, далее через месяц, через 4 месяца, 16 месяцев. Желательно их распечатать после сохранения. ПРИЯТНОЙ УЧЕБЫ!</p></div>
+  </div>
+  <script>
+  var button = document.getElementById("myButton");
+  var text = document.getElementById("myText");
+  
+  button.onclick = function(){
+    if(text.style.display == "none"){
+      text.style.display = "block";
+    } else {
+      text.style.display = "none";
+    }
+  }
+  </script>
+ <h1>История для запоминания</h1>
+ <br>
+
+
+
+ <div id="story"></div>
+
+ <h2>Рисовалка</h2>
+
+ <canvas id="canvas" width= "900" height="400"></canvas>
+ <button onclick="clearCanvas()" id="clearCanvas">Очистить холст</button>
+ <button onclick="saveCanvas()" id="saveCanvas">Сохранить</button>
+ <button onclick="addText()" id="addText">Добавить текст на картинку</button>
+ <input type="color" id="color">
+
+ <script>
+
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+  let painting = false;
+  
+  const colorPicker = document.getElementById("color");
+  let color = "black";
+
+
+
+  function startPosition(e) {
+   painting = true;
+   draw(e);
+  }
+
+  function finishedPosition() {
+   painting = false;
+   ctx.beginPath();
+  }
+
+
+
+  function draw(e) {
+   if(!painting) return;
+   ctx.lineWidth = 5;
+   ctx.lineCap = "round";
+   // обновляем цвет из colorPicker
+   ctx.strokeStyle = colorPicker.value;
+
+   ctx.lineTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+   ctx.stroke();
+   ctx.beginPath();
+   ctx.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+      function saveCanvas() {
+      const link = document.createElement('a');
+      link.download = 'painting.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      }
+  }
+
+  canvas.addEventListener("mousedown", startPosition);
+  canvas.addEventListener("mouseup", finishedPosition);
+  canvas.addEventListener("mousemove", draw);
+
+  colorPicker.addEventListener("change", (e) => { color = e.target.value; }); 
+
+  function clearCanvas() {
+   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  function saveCanvas() {
+   const link = document.createElement('a');
+   link.download = 'painting.png';
+   link.href = canvas.toDataURL('image/png');
+   link.click();
+  }
+
+  function addText() {
+   const textDiv = document.createElement('div');
+   textDiv.id = "textDiv";
+
+   const input = document.createElement('input');
+   input.type = "text";
+   input.placeholder = "Введите текст для добавления";
+   input.style.marginBottom = "10px";
+
+   const submitBtn = document.createElement('button');
+   submitBtn.textContent = "Добавить";
+   submitBtn.onclick = function() {
+     const text = input.value.trim();
+
+     if(text) {
+       const x = canvas.width / 2;
+       const y = canvas.height - 20;
+       ctx.fillStyle = "white";
+       ctx.fillRect(0, 0, canvas.width, canvas.height);
+       ctx.fillStyle = "black";
+       ctx.font = "bold 25px Arial";
+       ctx.textAlign = "center";
+       ctx.textBaseline = "bottom";
+       ctx.fillText(text, x, canvas.height - 20);  
+     }
+
+     textDiv.remove();
+   };
+
+   const cancelBtn = document.createElement('button');
+   cancelBtn.textContent = "Отмена";
+   cancelBtn.onclick = function() {
+     textDiv.remove();
+   };
+
+   textDiv.appendChild(input);
+   textDiv.appendChild(submitBtn);
+   textDiv.appendChild(cancelBtn);
+
+   canvas.insertAdjacentElement("beforebegin", textDiv);
+  }
+
+  function capitalizeFirstLetter(string) {
+   return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+
+  function generateStory() {
+   const words = document.getElementById("words").value.trim().replace(/  +/g, ' ');
+   const storyDiv = document.getElementById("story");
+   if(words) {
+    const story = generate(words.split(" "));
+    storyDiv.textContent = capitalizeFirstLetter(story);
+    storyDiv.style.display = "block";
+   } else {
+    storyDiv.style.display = "none";
+   }
+  }
+
+  function generate(words) {
+   const story = [];
+   for(let i = 0; i < words.length; i++) {
+    let randIndex = Math.floor(Math.random() * words.length);
+    let word = words[randIndex];
+
+    if(i > 0 && i < words.length - 1 && Math.random() < 0.5) {
+     story.push("и");
+    }
+
+    if(/^[а-яА-ЯёЁ]+$/.test(word)) {
+      if(i === words.length - 1) {
+        story.push(word + "ю");
+      } else {
+        story.push(word);
+      }
+    } else {
+      story.push(word);
+    }
+
+    if(i === words.length - 2) {
+     story.push("и");
+    } else if(i < words.length - 2) {
+     story.push(",");
+    }
+   }
+
+   return story.join(" ") + ".";
+  }
+
+
+ </script>
+</body>
+</html>
